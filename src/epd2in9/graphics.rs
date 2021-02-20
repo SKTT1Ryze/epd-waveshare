@@ -22,15 +22,24 @@ impl Default for Display2in9 {
     }
 }
 
-impl DrawTarget<BinaryColor> for Display2in9 {
-    type Error = core::convert::Infallible;
-
-    fn draw_pixel(&mut self, pixel: Pixel<BinaryColor>) -> Result<(), Self::Error> {
-        self.draw_helper(WIDTH, HEIGHT, pixel)
-    }
-
+impl OriginDimensions for Display2in9 {
     fn size(&self) -> Size {
         Size::new(WIDTH, HEIGHT)
+    }
+}
+
+impl DrawTarget for Display2in9 {
+    type Error = core::convert::Infallible;
+    type Color = BinaryColor;
+
+    fn draw_iter<I>(&mut self, pixels: I) -> Result<(), Self::Error>
+    where
+            I: IntoIterator<Item = Pixel<Self::Color>>
+    {
+        for pixel in pixels.into_iter() {
+            self.draw_helper(WIDTH, HEIGHT, pixel)?;
+        }
+        Ok(())
     }
 }
 

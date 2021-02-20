@@ -29,7 +29,7 @@ impl Default for DisplayRotation {
 /// - Drawing (With the help of DrawTarget/Embedded Graphics)
 /// - Rotations
 /// - Clearing
-pub trait Display: DrawTarget<BinaryColor> {
+pub trait Display: DrawTarget {
     /// Clears the buffer of the display with the chosen background color
     fn clear_buffer(&mut self, background_color: Color) {
         for elem in self.get_mut_buffer().iter_mut() {
@@ -91,7 +91,7 @@ pub trait Display: DrawTarget<BinaryColor> {
 /// - Drawing (With the help of DrawTarget/Embedded Graphics)
 /// - Rotations
 /// - Clearing
-pub trait OctDisplay: DrawTarget<OctColor> {
+pub trait OctDisplay: DrawTarget {
     /// Clears the buffer of the display with the chosen background color
     fn clear_buffer(&mut self, background_color: OctColor) {
         for elem in self.get_mut_buffer().iter_mut() {
@@ -157,8 +157,7 @@ pub trait OctDisplay: DrawTarget<OctColor> {
 /// # use epd_waveshare::graphics::VarDisplay;
 /// # use epd_waveshare::color::Black;
 /// # use embedded_graphics::prelude::*;
-/// # use embedded_graphics::primitives::{Circle, Line};
-/// # use embedded_graphics::style::PrimitiveStyle;
+/// # use embedded_graphics::primitives::{Circle, Line, PrimitiveStyle};
 /// let width = 128;
 /// let height = 296;
 ///
@@ -194,15 +193,24 @@ impl<'a> VarDisplay<'a> {
     }
 }
 
-impl<'a> DrawTarget<BinaryColor> for VarDisplay<'a> {
-    type Error = core::convert::Infallible;
-
-    fn draw_pixel(&mut self, pixel: Pixel<BinaryColor>) -> Result<(), Self::Error> {
-        self.draw_helper(self.width, self.height, pixel)
-    }
-
+impl<'a> OriginDimensions for VarDisplay<'a> {
     fn size(&self) -> Size {
         Size::new(self.width, self.height)
+    }
+}
+
+impl<'a> DrawTarget for VarDisplay<'a> {
+    type Color = BinaryColor;
+    type Error = core::convert::Infallible;
+
+    fn draw_iter<I>(&mut self, pixels: I) -> Result<(), Self::Error>
+    where
+            I: IntoIterator<Item = Pixel<Self::Color>>
+    {
+        for pixel in pixels.into_iter() {
+            self.draw_helper(self.width, self.height, pixel)?;
+        }
+        Ok(())
     }
 }
 
@@ -296,7 +304,7 @@ mod tests {
     use super::{buffer_len, find_position, outside_display, Display, DisplayRotation, VarDisplay};
     use crate::color::Black;
     use crate::color::Color;
-    use embedded_graphics::{prelude::*, primitives::Line, style::PrimitiveStyle};
+    use embedded_graphics::{prelude::*, primitives::{Line, PrimitiveStyle}};
 
     #[test]
     fn buffer_clear() {
