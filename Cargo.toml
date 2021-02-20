@@ -3,7 +3,7 @@ authors = ["Christoph Groß <caemor@mailbox.org>"]
 categories = ["embedded", "hardware-support", "no-std"]
 description = "An embedded-hal based driver for ePaper displays from Waveshare formerly published as eink-waveshare-rs"
 documentation = "https://docs.rs/epd-waveshare"
-homepage = "https://github.com/caemor/epd-waveshare"
+homepage = "https://github.com/SKTT1Ryze/epd-waveshare"
 keywords = ["ePaper", "Display", "epd", "eink"]
 license = "ISC"
 name = "epd-waveshare"
@@ -16,7 +16,8 @@ edition = "2018"
 # travis-ci = { repository = "caemor/epd-waveshare" }
 
 [dependencies]
-embedded-graphics = { git = "https://github.com/SKTT1Ryze/embedded-graphics.git", optional = true}
+embedded-graphics = { git = "https://github.com/SKTT1Ryze/embedded-graphics.git", branch = "sktt1ryze", optional = true}
+# embedded-graphics = { path = "/home/hustccc/embedded-graphics", optional = true}
 embedded-hal = {version = "0.2.4", features = ["unproven"]}
 bit_field = "0.10.1"
 
